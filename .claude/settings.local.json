@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(npm run dev:*)",
+      "Bash(taskkill:*)",
+      "Bash(npm run build:*)",
+      "Bash(pkill:*)",
+      "Bash(python -m http.server:*)"
+    ]
+  }
+}

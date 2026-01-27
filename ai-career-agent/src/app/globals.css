@@ -1,0 +1,160 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Custom utility classes from original design */
+.glass-card {
+  @apply bg-white rounded-2xl border border-slate-200 shadow-card transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5;
+}
+
+/* Ensure proper stacking context for glass cards */
+.glass-card {
+  position: relative;
+  z-index: 1;
+}
+
+.glass-card:hover {
+  z-index: 10;
+}
+
+/* Isolate hero button group hover effects */
+.hero-button {
+  isolation: isolate;
+}
+
+.hero-button > .group-hover\:opacity-100 {
+  pointer-events: none;
+}
+
+.btn-primary {
+  @apply px-6 py-3 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800 transition-colors shadow-lg shadow-slate-900/10 hover:shadow-xl hover:shadow-slate-900/20 active:scale-[0.98] overflow-hidden;
+}
+
+/* Removed blocking overlay
+.btn-primary::before {
+  content: '';
+  @apply absolute inset-0 bg-indigo-600 opacity-0 transition-opacity duration-300 pointer-events-none;
+}
+
+.btn-primary:hover::before {
+  opacity: 1;
+}
+*/
+
+
+.btn-primary > span {
+  @apply relative z-10;
+}
+
+/* Custom scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Loading spinner */
+.loader {
+  width: 20px;
+  height: 20px;
+  border: 2px solid;
+  border-radius: 50%;
+  border-top-color: white;
+  border-right-color: white;
+  border-bottom-color: transparent;
+  border-left-color: transparent;
+  animation: spin 0.8s linear infinite;
+}
+
+/* Markdown styling */
+.markdown-prose {
+  @apply text-slate-700 leading-relaxed;
+}
+
+.markdown-prose p {
+  margin-bottom: 1.25rem;
+}
+
+.markdown-prose ul {
+  list-style-type: square;
+  padding-left: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.markdown-prose ul li::marker {
+  color: #64748b;
+}
+
+.markdown-prose li {
+  margin-bottom: 0.5rem;
+}
+
+.markdown-prose strong {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.markdown-prose h2 {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.5rem;
+  letter-spacing: -0.03em;
+  margin-top: 2rem;
+  border-bottom: none;
+}
+
+.markdown-prose blockquote {
+  border-left: 2px solid #6366f1;
+  padding-left: 1rem;
+  font-style: italic;
+  color: #64748b;
+  background: #f8fafc;
+  padding: 1rem;
+  border-radius: 0 8px 8px 0;
+}
+
+/* Copilot Markdown Specifics */
+.markdown-copilot p {
+  margin-bottom: 0.5rem;
+}
+
+.markdown-copilot ul {
+  list-style-type: disc;
+  padding-left: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.markdown-copilot li {
+  margin-bottom: 0.25rem;
+}
+
+.markdown-copilot *:last-child {
+  margin-bottom: 0;
+}
+
+.markdown-copilot strong {
+  color: inherit;
+  font-weight: 700;
+}
