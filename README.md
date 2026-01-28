@@ -26,7 +26,6 @@
 ### 智感编辑器 (Intelligent Editor)
 采用左侧对话式交互、右侧实时 A4 预览的分栏设计。支持通过自然语言指令实时修改简历内容，配合 Markdown 实时渲染引擎，实现"所见即所得"的极致编辑体验。
 <video src="https://github.com/user-attachments/assets/6ae745dc-9753-4899-ab14-58112a81099c" controls="controls" width="100%" style="max-width: 800px;"></video>
-
 ### 多 Agent 模拟面试 (Multi-Agent Interview)
 构建了包含 HR、技术负责人、业务总监等不同角色的 Agent 矩阵。模拟真实的职场面试压力与追问逻辑，提供沉浸式的实战演练环境，并生成包含评分与改进建议的详细复盘报告。
 <video src="https://github.com/user-attachments/assets/e3df23b6-a74d-49d8-a5fb-b1cf22e92aed" controls="controls" width="100%" style="max-width: 800px;"></video>
@@ -79,7 +78,7 @@ DEEPSEEK_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxx
 ```bash
 npm run dev
 ```
-访问 `http://localhost:3000` 即可开启体验。
+访问 `https://github.com/mia-106/zhigan-agent` 即可开启体验。
 
 
 
