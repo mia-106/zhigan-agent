@@ -8,7 +8,7 @@
 [![Zustand](https://img.shields.io/badge/State-Zustand-orange?style=flat-square)](https://github.com/pmndrs/zustand)
 [![DeepSeek](https://img.shields.io/badge/AI-DeepSeek%20V3-blueviolet?style=flat-square)](https://www.deepseek.com/)
 
-![项目截图](./image.png)
+![项目截图](image.png)
 
 
 ## 项目初衷 (Project Vision)
@@ -21,12 +21,15 @@
 
 ### 全维诊断 (Comprehensive Diagnostic)
 打破传统"文本润色"的局限，基于目标 JD (Job Description) 对简历进行深度语义分析。系统生成多维度量化雷达图，直观展示候选人与岗位的匹配度，精准定位竞争力短板。
+<video src="https://github.com/user-attachments/assets/90d46092-d6f2-4081-9b58-7784f944cd30" controls="controls" width="100%" style="max-width: 800px;"></video>
 
 ### 智感编辑器 (Intelligent Editor)
 采用左侧对话式交互、右侧实时 A4 预览的分栏设计。支持通过自然语言指令实时修改简历内容，配合 Markdown 实时渲染引擎，实现"所见即所得"的极致编辑体验。
+<video src="https://github.com/user-attachments/assets/6ae745dc-9753-4899-ab14-58112a81099c" controls="controls" width="100%" style="max-width: 800px;"></video>
 
 ### 多 Agent 模拟面试 (Multi-Agent Interview)
 构建了包含 HR、技术负责人、业务总监等不同角色的 Agent 矩阵。模拟真实的职场面试压力与追问逻辑，提供沉浸式的实战演练环境，并生成包含评分与改进建议的详细复盘报告。
+<video src="https://github.com/user-attachments/assets/e3df23b6-a74d-49d8-a5fb-b1cf22e92aed" controls="controls" width="100%" style="max-width: 800px;"></video>
 
 ## 硬核技术挑战 (Technical Highlights)
 
