@@ -78,7 +78,7 @@ DEEPSEEK_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxx
 ```bash
 npm run dev
 ```
-访问 `https://github.com/mia-106/zhigan-agent` 即可开启体验。
+访问 `https://zhigan-agent.vercel.app/` 即可开启体验。
 
 
 
