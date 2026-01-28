@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+export const runtime = 'edge'
+
 type ChatMessage = {
   role: 'user' | 'assistant'
   content: string
@@ -34,40 +36,38 @@ const limitText = (text: string, maxLength: number) => {
   return `${text.slice(0, maxLength)}...`
 }
 
-const REVIEW_PROMPT_TEMPLATE = `# Role & Identity
-你是一名世界500强企业的资深面试评估专家。你收到了候选人与面试官在 \${role} 环节的完整对话记录。
+const REVIEW_PROMPT_TEMPLATE = `# Role
+资深面试官。
 
 # Task
-请基于对话记录，对候选人的表现进行深度复盘和评估。
+基于对话生成精炼复盘报告(JSON)。
 
-# CRITICAL RULES (防幻觉)
-1. **真实性校验**：必须基于[完整对话历史]进行评估。如果候选人没有回答问题，或者回答极其简短（如“不知道”、“好的”、“...”），严禁虚构其表现。
-2. **参与度判定**：如果候选人几乎没有实质性回答，综合评分(score)必须在 0-30 分之间，并在 feedback 中明确指出其未参与面试。
-3. **严禁凭空赞扬**：如果候选人表现不佳或未回答，严禁给出“技术方案理解透彻”、“表达流畅”等正面评价。
+# Rules
+1. **真实性**：仅基于对话。无回答则不得分。
+2. **精炼**：语言极简，直击要点。
+3. **格式**：纯JSON，无Markdown，无废话。
 
-# Dimensions for Evaluation
-1. **胜任力匹配度**：候选人的回答是否证明了其具备简历中所述的专业能力？
-2. **逻辑与表达**：表达是否清晰、专业，是否有逻辑断层？
-3. **压力与应变**：在追问环节的表现如何？
-4. **真实性核实**：简历描述与口头表达是否存在严重不一致？
-
-# Output Format (JSON)
-返回一个包含以下字段的 JSON 对象：
-- \`score\`: 0-100 的综合评分。
-- \`strengths\`: 字符串数组，候选人表现出的 2-3 个核心亮点。如果无亮点则为空数组。
-- \`weaknesses\`: 字符串数组，候选人暴露出的 2-3 个潜在风险或短板。
-- \`detailedFeedback\`: 详细的定性分析报告（支持 Markdown 格式）。
-- \`suggestions\`: 给候选人的改进建议。
-- \`questionsAnalysis\`: 数组，包含面试中提到的每个核心问题及其分析。每个对象包含：
-    - \`question\`: 面试官提问的具体内容。
-    - \`userAnswer\`: 候选人的回答内容（如未回答请注明“未回答”）。
-    - \`referenceAnswer\`: 针对该问题，结合职位JD和候选人简历，给出的**教科书级参考回答**。
+# Output (JSON)
+{
+  "score": 0-100,
+  "strengths": ["亮点1", "亮点2"],
+  "weaknesses": ["不足1", "不足2"],
+  "detailedFeedback": "简短分析(支持Markdown)",
+  "suggestions": "1-2条核心建议",
+  "questionsAnalysis": [
+    {
+      "question": "原题",
+      "userAnswer": "摘要(未回答填'未回答')",
+      "referenceAnswer": "简练的核心回答要点"
+    }
+  ]
+}
 
 # Inputs
-[面试环节]: \${role}
-[职位JD]: \${jd}
-[候选人简历]: \${resume}
-[完整对话历史]:
+[Role]: \${role}
+[JD]: \${jd}
+[Resume]: \${resume}
+[History]:
 \${history}
 `
 
