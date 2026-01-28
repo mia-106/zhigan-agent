@@ -1032,6 +1032,60 @@ const HomePage = () => {
     </div>
   )
 
+  // Robust JSON parsing and sanitization (Moved from backend for streaming support)
+  const sanitizeReviewData = (data: any) => {
+    return {
+      score: typeof data.score === 'number' ? data.score : 0,
+      strengths: Array.isArray(data.strengths) ? data.strengths : [],
+      weaknesses: Array.isArray(data.weaknesses) ? data.weaknesses : [],
+      detailedFeedback: data.detailedFeedback || data.feedback || data.analysis || '暂无详细分析',
+      suggestions: data.suggestions || '暂无建议',
+      questionsAnalysis: Array.isArray(data.questionsAnalysis) ? data.questionsAnalysis.map((q: any) => ({
+        question: q.question || '未知问题',
+        userAnswer: q.userAnswer || '未回答',
+        referenceAnswer: q.referenceAnswer || '暂无参考回答'
+      })) : []
+    }
+  }
+
+  const parseJSONRobust = (str: string) => {
+    try {
+      return JSON.parse(str)
+    } catch (e) {
+      const cleanStr = str.replace(/^```json\s*/, '').replace(/^```\s*/, '').replace(/\s*```$/, '').trim()
+      try {
+        return JSON.parse(cleanStr)
+      } catch (e2) {
+        const firstBrace = str.indexOf('{')
+        const lastBrace = str.lastIndexOf('}')
+        if (firstBrace !== -1 && lastBrace !== -1) {
+          const subStr = str.substring(firstBrace, lastBrace + 1)
+          try {
+             return JSON.parse(subStr)
+          } catch (e3) {
+             let fixedStr = subStr.replace(/,(\s*[}\]])/g, '$1')
+             try {
+               return JSON.parse(fixedStr)
+             } catch (e4) {
+               try {
+                 const escaped = fixedStr.replace(/\n/g, '\\n').replace(/\r/g, '')
+                 return JSON.parse(escaped)
+               } catch (e5) {
+                 try {
+                   const flattened = fixedStr.replace(/[\r\n]/g, ' ')
+                   return JSON.parse(flattened)
+                 } catch (e6) {
+                   throw e
+                 }
+               }
+             }
+          }
+        }
+        throw e
+      }
+    }
+  }
+
   const handleEndInterview = async () => {
     if (!confirm('确定要结束本次面试并查看复盘报告吗？')) return
     
@@ -1058,7 +1112,23 @@ const HomePage = () => {
         throw new Error(errorData.error || '复盘报告生成失败')
       }
 
-      const data = await response.json()
+      // Streaming response handling
+      if (!response.body) throw new Error('ReadableStream not supported')
+      
+      const reader = response.body.getReader()
+      const decoder = new TextDecoder()
+      let result = ''
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        result += decoder.decode(value, { stream: true })
+      }
+
+      // Parse and sanitize the accumulated JSON
+      const parsedData = parseJSONRobust(result)
+      const data = sanitizeReviewData(parsedData)
+      
       setReviewData(data)
 
       // 保存到历史记录

@@ -130,8 +130,9 @@ export async function POST(request: NextRequest) {
           messages: [
             { role: 'system', content: systemPrompt }
           ],
-          temperature: 0.3, // 降低随机性，确保 JSON 格式稳定
-          response_format: { type: 'json_object' }
+          temperature: 0.3,
+          response_format: { type: 'json_object' },
+          stream: true
         }),
         signal: controller.signal
       })
@@ -144,62 +145,55 @@ export async function POST(request: NextRequest) {
         throw new Error(`DeepSeek API returned ${response.status}: ${errorText}`)
       }
 
-      const data = await response.json()
-      const content = data.choices[0].message.content
-      
-      // 增强的 JSON 解析逻辑
-      const parseJSON = (str: string) => {
-        // 1. 尝试直接解析
-        try {
-          return JSON.parse(str)
-        } catch (e) {
-          // 2. 尝试移除 Markdown 标记后解析
-          const cleanStr = str.replace(/^```json\s*/, '').replace(/^```\s*/, '').replace(/\s*```$/, '').trim()
+      // Streaming support logic with SSE parsing
+      const stream = new ReadableStream({
+        async start(controller) {
           try {
-            return JSON.parse(cleanStr)
-          } catch (e2) {
-            // 3. 尝试提取 JSON 对象（查找首个 { 和最后一个 }）
-            const firstBrace = str.indexOf('{')
-            const lastBrace = str.lastIndexOf('}')
-            if (firstBrace !== -1 && lastBrace !== -1) {
-              const subStr = str.substring(firstBrace, lastBrace + 1)
-              try {
-                return JSON.parse(subStr)
-              } catch (e3) {
-                 // 4. 尝试修复常见 JSON 错误（如末尾逗号）
-                 let fixedStr = subStr.replace(/,(\s*[}\]])/g, '$1')
-                 try {
-                   return JSON.parse(fixedStr)
-                 } catch (e4) {
-                   // 5. 处理未转义的换行符 (DeepSeek 偶尔会输出实际换行符)
-                   // 策略 A: 假设是压缩格式，直接替换为 \n (保留内容格式)
-                   try {
-                     const escaped = fixedStr.replace(/\n/g, '\\n').replace(/\r/g, '')
-                     return JSON.parse(escaped)
-                   } catch (e5) {
-                     // 策略 B: 假设是 Pretty 格式，替换为空格 (牺牲内容格式以确保解析成功)
-                     try {
-                       const flattened = fixedStr.replace(/[\r\n]/g, ' ')
-                       return JSON.parse(flattened)
-                     } catch (e6) {
-                       throw e // 抛出原始错误以便上层捕获
-                     }
-                   }
-                 }
+            if (!response.body) throw new Error('No response body')
+            const reader = response.body.getReader()
+            const decoder = new TextDecoder()
+            let buffer = ''
+
+            while (true) {
+              const { done, value } = await reader.read()
+              if (done) break
+              
+              buffer += decoder.decode(value, { stream: true })
+              const lines = buffer.split('\n')
+              buffer = lines.pop() || '' // Keep the last incomplete line
+
+              for (const line of lines) {
+                const trimmedLine = line.trim()
+                if (!trimmedLine || trimmedLine === 'data: [DONE]') continue
+                
+                if (trimmedLine.startsWith('data: ')) {
+                  try {
+                    const jsonStr = trimmedLine.slice(6)
+                    const data = JSON.parse(jsonStr)
+                    const content = data.choices?.[0]?.delta?.content || ''
+                    if (content) {
+                      controller.enqueue(new TextEncoder().encode(content))
+                    }
+                  } catch (e) {
+                    console.warn('[Review Stream] SSE parse error:', e)
+                  }
+                }
               }
             }
-            throw e
+            controller.close()
+          } catch (error) {
+            console.error('[Review Stream] Error:', error)
+            controller.error(error)
           }
         }
-      }
+      })
 
-      try {
-        const parsedContent = parseJSON(content)
-        return NextResponse.json(sanitizeReviewData(parsedContent))
-      } catch (parseError: any) {
-        console.error('[Review API] JSON parse error:', parseError, 'Raw content:', content)
-        return NextResponse.json(buildFallbackReport(`复盘内容解析失败: ${parseError.message}。请重试。原始输出片段：${limitText(content, 200)}`))
-      }
+      return new NextResponse(stream, {
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+          'Transfer-Encoding': 'chunked'
+        }
+      })
     } finally {
       clearTimeout(timeoutId)
     }
