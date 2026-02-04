@@ -1,6 +1,8 @@
 # 智感生涯 (AI Career Intelligence)
 
 > 连接 AI 能力与职场未来的全栈桥梁
+>
+> 🔗 **在线体验**: [https://zhigan-agent.vercel.app/](https://zhigan-agent.vercel.app/)
 
 [![Next.js](https://img.shields.io/badge/Next.js-14.2-black?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
@@ -78,7 +80,7 @@ DEEPSEEK_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxx
 ```bash
 npm run dev
 ```
-访问 `https://zhigan-agent.vercel.app/` 即可开启体验。
+访问 `http://localhost:3000` 即可开启体验。
 
 
 
